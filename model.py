@@ -1,5 +1,9 @@
 import csv
 import sys
+import json
+
+SCHOOL_NAME = 1
+SCHOOL_CONF = 2
 
 ADJ_O = 5 # col 6 on kenpom
 ADJ_D = 6 # col 7 on kenpom
@@ -11,11 +15,11 @@ TOV = 31 # col 32 on SR
 ORB = 32 # col 33 on SR
 FT_FGA = 33 # col 34 on SR
 
-school_stats = []
-opponent_stats = []
-kenpom_stats = []
-
 def main(argv):
+    school_stats = []
+    opponent_stats = []
+    kenpom_stats = []
+
     if (len(argv) != 4):
         print("USAGE: python model.py [school-stats] [opponent-stats] [kenpom-stats]")
     else:
@@ -43,9 +47,113 @@ def main(argv):
                 arr.append(line)
 
             kenpom_stats = arr
-        
 
-def calculateSR(home, away, stat):
+        print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
+        home = input("Choose home team: ")
+        away = input("Choose away team: ")
+        while (home != 'exit' and away != 'exit'):
+            home_k = -1
+            away_k = -1
+            home_sr = -1
+            away_sr = -1
+            i = 0
+
+            for school in kenpom_stats:
+                if school[SCHOOL_NAME] == home:
+                    home_k = i
+                    if home[len(home)-3:len(home)] == 'St.':
+                        home = home[0:len(home)-3]
+                        home += "State"
+                    elif home == 'LSU':
+                        home = "Louisiana State"
+                i += 1
+            i = 0
+
+            for school in kenpom_stats:
+                if school[SCHOOL_NAME] == away:
+                    away_k = i
+                    if away[len(away)-3:len(away)] == 'St.':
+                        away = away[0:len(away)-3]
+                        away += "State"
+                    elif away == 'LSU':
+                        away = "Louisiana State"
+                i += 1
+            i = 0
+            
+            for school in school_stats:
+                if school[SCHOOL_NAME] == home:
+                    home_sr = i
+                i += 1
+            i = 0
+            
+            for school in school_stats:
+                if school[SCHOOL_NAME] == away:
+                    away_sr = i
+                i += 1
+
+            if home_k == -1 or away_k == -1:
+                print("Schools not found in kenpom. Please try again with correct school names. Reference the kenpom stats for what to call the school")
+                print("Restarting.\n")
+                print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
+                home = input("Choose home team: ")
+                away = input("Choose away team: ")
+                continue
+
+            if home_sr == -1 or away_sr == -1:
+                print("Schools not found in sports-ref. Please try again with correct school names. Reference the kenpom stats for what to call the school")
+                print("Restarting.\n")
+                print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
+                home = input("Choose home team: ")
+                away = input("Choose away team: ")
+                continue
+
+            result = calculateFinal(home_sr, away_sr, home_k, away_k, school_stats, opponent_stats, kenpom_stats)
+
+            print("The result is: " + str(result))
+            response = input("Continue or Exit?: ").lower()
+            if response == 'exit':
+                break
+            print("Restarting.\n")
+            print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
+            home = input("Choose home team: ")
+            away = input("Choose away team: ")
+
+
+
+                
+
+def calculateFinal(home_sr: int, away_sr: int, home_k: int, away_k: int, 
+                   school_stats: list, opponent_stats: list, kenpom_stats: list) -> float:
+    total: float = 0.0
+
+    total += calculateSR(home_sr, away_sr, EFG, school_stats, opponent_stats)
+    total += calculateSR(home_sr, away_sr, TOV, school_stats, opponent_stats)
+    total += calculateSR(home_sr, away_sr, ORB, school_stats, opponent_stats)
+    total += calculateSR(home_sr, away_sr, FT_FGA, school_stats, opponent_stats)
+
+    total += calculateKenpom(home_k, away_k, ADJ_O, kenpom_stats)
+    total += calculateKenpom(home_k, away_k, ADJ_D, kenpom_stats)
+    total += calculateKenpom(home_k, away_k, LUCK, kenpom_stats)
+    total += calculateKenpom(home_k, away_k, SOS, kenpom_stats)
+
+    f = open('hca.json')
+    all_hca = json.load(f)
+    home_name = kenpom_stats[home_k][SCHOOL_NAME]
+    home_conf = kenpom_stats[home_k][SCHOOL_CONF]
+
+    if home_name in all_hca['schools'].keys():
+        hca = all_hca['schools'][home_name]
+    elif home_conf in all_hca['conferences'].keys():
+        hca = all_hca['conferences'][home_conf]
+    else:
+        hca = all_hca['general']
+    
+    total += hca
+
+    return total
+
+def calculateSR(home: int, away: int, stat: int, 
+                school_stats: list, opponent_stats: list) -> float:
     if stat == EFG:
         factor = 50
     elif stat == TOV:
@@ -56,24 +164,24 @@ def calculateSR(home, away, stat):
         factor = 5
 
     if stat == TOV:
-        home_diff = opponent_stats[stat][home] - school_stats[stat][home]
-        away_diff = opponent_stats[stat][away] - school_stats[stat][away]
+        home_diff = float(opponent_stats[home][stat]) - float(school_stats[home][stat])
+        away_diff = float(opponent_stats[away][stat]) - float(school_stats[away][stat])
     else:
-        home_diff = school_stats[stat][home] - opponent_stats[stat][home]
-        away_diff = school_stats[stat][away] - opponent_stats[stat][away]
+        home_diff = float(school_stats[home][stat]) - float(opponent_stats[home][stat])
+        away_diff = float(school_stats[away][stat]) - float(opponent_stats[away][stat])
 
     difference = home_diff - away_diff
     finalValue = difference * factor
 
-    return finalValue
+    return float(finalValue)
 
-def calculateKenpom(home, away, stat):
+def calculateKenpom(home: int, away: int, stat: int, kenpom_stats: list) -> float:
     if stat == LUCK:
-        finalValue = -(kenpom_stats[stat][home] - kenpom_stats[stat][away])/3
+        finalValue = -(float(kenpom_stats[home][stat]) - float(kenpom_stats[away][stat]))/3
     else:
-        finalValue = (kenpom_stats[stat][home] - kenpom_stats[stat][away])/3
+        finalValue = (float(kenpom_stats[home][stat]) - float(kenpom_stats[away][stat]))/3
     
-    return finalValue
+    return float(finalValue)
 
 
 if __name__ == "__main__":

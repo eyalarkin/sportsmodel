@@ -1,0 +1,31 @@
+{
+    "schools": {
+        "Kansas": 4.763,
+        "Duke": 4.723,
+        "Kentucky": 4.683,
+        "BYU": 4.633,
+        "Michigan St.": 4.583,
+        "Arizona": 4.533,
+        "Purdue": 4.483,
+        "UCLA": 4.433,
+        "North Carolina": 4.383,
+        "Ohio St.": 4.333,
+        "Wisconsin": 4.283,
+        "Arkansas": 4.233,
+        "Notre Dame": 4.183,
+        "Florida": 4.133,
+        "Houston": 4.083
+    },
+    "conferences": {
+        "B10": 3.55,
+        "MWC": 3.75,
+        "B12": 3.514,
+        "MAAC": 2.356,
+        "OVC": 2.389,
+        "Ivy": 2.457,
+        "P12": 3.5,
+        "ACC": 3.75,
+        "BE": 3.5
+    },
+    "general": 3.043
+}
