@@ -107,7 +107,8 @@ def main(argv):
                 away = input("Choose away team: ")
                 continue
 
-            result = calculateFinal(home_sr, away_sr, home_k, away_k, school_stats, opponent_stats, kenpom_stats)
+            result = calculateFinal(home_sr, away_sr, home_k, away_k, 
+                                    school_stats, opponent_stats, kenpom_stats)
 
             print("The result is: " + str(result))
             response = input("Continue or Exit?: ").lower()
