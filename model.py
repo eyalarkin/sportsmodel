@@ -2,8 +2,8 @@ import csv
 import sys
 import json
 
-SCHOOL_NAME = 1
-SCHOOL_CONF = 2
+SCHOOL_NAME = 1 # col 2 on kenpom
+SCHOOL_CONF = 2 # col 3 on kenpom
 
 ADJ_O = 5 # col 6 on kenpom
 ADJ_D = 6 # col 7 on kenpom
@@ -118,9 +118,6 @@ def main(argv):
             home = input("Choose home team: ")
             away = input("Choose away team: ")
 
-
-
-                
 
 def calculateFinal(home_sr: int, away_sr: int, home_k: int, away_k: int, 
                    school_stats: list, opponent_stats: list, kenpom_stats: list) -> float:
