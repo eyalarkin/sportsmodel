@@ -6,7 +6,7 @@ SCHOOL_NAME = 1 # col 2 on kenpom
 SCHOOL_CONF = 2 # col 3 on kenpom
 
 ADJ_O = 5 # col 6 on kenpom
-ADJ_D = 6 # col 7 on kenpom
+ADJ_D = 7 # col 7 on kenpom
 LUCK = 11 # col 12 on kenpom
 SOS = 13 # col 14 on kenpom
 
@@ -124,15 +124,33 @@ def calculateFinal(home_sr: int, away_sr: int, home_k: int, away_k: int,
                    school_stats: list, opponent_stats: list, kenpom_stats: list) -> float:
     total: float = 0.0
 
-    total += calculateSR(home_sr, away_sr, EFG, school_stats, opponent_stats)
-    total += calculateSR(home_sr, away_sr, TOV, school_stats, opponent_stats)
-    total += calculateSR(home_sr, away_sr, ORB, school_stats, opponent_stats)
-    total += calculateSR(home_sr, away_sr, FT_FGA, school_stats, opponent_stats)
+    efg_total = calculateSR(home_sr, away_sr, EFG, school_stats, opponent_stats)
+    print("EFG TOTAL: ", efg_total)
 
-    total += calculateKenpom(home_k, away_k, ADJ_O, kenpom_stats)
-    total += calculateKenpom(home_k, away_k, ADJ_D, kenpom_stats)
-    total += calculateKenpom(home_k, away_k, LUCK, kenpom_stats)
-    total += calculateKenpom(home_k, away_k, SOS, kenpom_stats)
+    tov_total = calculateSR(home_sr, away_sr, TOV, school_stats, opponent_stats)
+    print("TOV TOTAL: ", tov_total)
+
+    orb_total = calculateSR(home_sr, away_sr, ORB, school_stats, opponent_stats)
+    print("ORB TOTAL: ", orb_total)
+
+    ft_total = calculateSR(home_sr, away_sr, FT_FGA, school_stats, opponent_stats)
+    print("FT TOTAL: ", ft_total)
+
+    total += efg_total + tov_total + orb_total + ft_total
+
+    adjo_total = calculateKenpom(home_k, away_k, ADJ_O, kenpom_stats)
+    print("ADJ_O TOTAL: ", adjo_total)
+
+    adjd_total = calculateKenpom(home_k, away_k, ADJ_D, kenpom_stats)
+    print("ADJ_D TOTAL: ", adjd_total)
+
+    luck_total = calculateKenpom(home_k, away_k, LUCK, kenpom_stats)
+    print("LUCK TOTAL: ", luck_total)
+
+    sos_total = calculateKenpom(home_k, away_k, SOS, kenpom_stats)
+    print("SOS TOTAL: ", sos_total)
+
+    total += adjo_total + adjd_total + luck_total + sos_total
 
     f = open('hca.json')
     all_hca = json.load(f)
@@ -162,8 +180,11 @@ def calculateSR(home: int, away: int, stat: int,
         factor = 5
 
     if stat == TOV:
-        home_diff = float(opponent_stats[home][stat]) - float(school_stats[home][stat])
-        away_diff = float(opponent_stats[away][stat]) - float(school_stats[away][stat])
+        home_diff = float(opponent_stats[home][stat])/100 - float(school_stats[home][stat])/100
+        away_diff = float(opponent_stats[away][stat])/100 - float(school_stats[away][stat])/100
+    elif stat == ORB:
+        home_diff = float(school_stats[home][stat])/100 - float(opponent_stats[home][stat])/100
+        away_diff = float(school_stats[away][stat])/100 - float(opponent_stats[away][stat])/100
     else:
         home_diff = float(school_stats[home][stat]) - float(opponent_stats[home][stat])
         away_diff = float(school_stats[away][stat]) - float(opponent_stats[away][stat])
@@ -176,6 +197,12 @@ def calculateSR(home: int, away: int, stat: int,
 def calculateKenpom(home: int, away: int, stat: int, kenpom_stats: list) -> float:
     if stat == LUCK:
         finalValue = -(float(kenpom_stats[home][stat]) - float(kenpom_stats[away][stat]))/3
+    elif stat == ADJ_D:
+        away_adj_d = float(kenpom_stats[away][stat])
+        print(kenpom_stats[away][SCHOOL_NAME] + " (AWAY) ADJ_D: " + str(away_adj_d))
+        home_adj_d = float(kenpom_stats[home][stat])
+        print(kenpom_stats[home][SCHOOL_NAME] + " (HOME) ADJ_D: " + str(home_adj_d))
+        finalValue = (away_adj_d - home_adj_d)/3
     else:
         finalValue = (float(kenpom_stats[home][stat]) - float(kenpom_stats[away][stat]))/3
     
