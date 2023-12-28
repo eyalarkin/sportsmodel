@@ -154,7 +154,10 @@ def main(argv):
             
             # we then print that result to the console, rounding it to 2 decimal
             # places
-            print("The result is: " + str(round(result, 2)))
+            if result >= 0:
+                print("The result is: +" + str(round(result, 2)) + "\n")
+            else:
+                print("The result is: " + str(round(result, 2)) + "\n")
 
             # here we give the user the option to either continue (search another
             # matchup), or to exit the UI.
@@ -277,8 +280,22 @@ def calculateFinal(home_sr: int, away_sr: int, home_k: int, away_k: int,
     # finally, we return the line prediction
     return total
 
+# PARAMS: 'home' - int, index of home team in sports-reference file
+#         'away' - int, index of away team in sports-reference file
+#         'stat' - int, index of statistic data in sports-reference file
+#         'school_stats' - 2D array representing sports-ref school stats
+#         'opponent_stats' - 2D array represent sports-ref opponent stats
+# RETURNS: float, the result of the statistical analysis of the 'stat' param
+#          for the inputted schools
 def calculateSR(home: int, away: int, stat: int, 
                 school_stats: list, opponent_stats: list) -> float:
+    # The goal of this function is to analyze the difference between a certain
+    # a team and all of their opponents for a certain statistic. Every
+    # statistic is weighed differently, as per the factor. For this we are
+    # using the sports-reference school statistics and opponent statistics
+
+    # First, we set the weight of the result by determining what statistic we
+    # are analyzing.
     if stat == EFG:
         factor = 50
     elif stat == TOV:
@@ -288,7 +305,11 @@ def calculateSR(home: int, away: int, stat: int,
     elif stat == FT_FGA:
         factor = 5
 
+    # For some statistics, the calculation is slightly different, so we make
+    # sure to use the correct one.
     if stat == TOV:
+        # The data is stored in the csv/array as a string, so we must convert
+        # it to a float so we can process.
         home_diff = float(opponent_stats[home][stat])/100 - float(school_stats[home][stat])/100
         away_diff = float(opponent_stats[away][stat])/100 - float(school_stats[away][stat])/100
     elif stat == ORB:
@@ -298,23 +319,37 @@ def calculateSR(home: int, away: int, stat: int,
         home_diff = float(school_stats[home][stat]) - float(opponent_stats[home][stat])
         away_diff = float(school_stats[away][stat]) - float(opponent_stats[away][stat])
 
+    # Then, we find the difference between our analysis of the home and away
+    # teams, and weigh it accordingly
     difference = home_diff - away_diff
     finalValue = difference * factor
 
+    # finally, we return the result, making sure it's a float
     return float(finalValue)
 
+# PARAMS: 'home' - int, index of home team in sports-reference file
+#         'away' - int, index of away team in sports-reference file
+#         'stat' - int, index of statistic data in sports-reference file
+#         'school_stats' - 2D array representing pomeroy college stats
+# RETURNS: float, the result of the statistical analysis of the 'stat' param
+#          for the inputted schools
 def calculateKenpom(home: int, away: int, stat: int, kenpom_stats: list) -> float:
+    # The goal of this function is to perform a similar calculation as the
+    # previous, however, this time using statistics from the pomeroy college
+    # data.
+
+    # Making sure we do the correct calculation for a certain statistic
     if stat == LUCK:
         finalValue = -(float(kenpom_stats[home][stat]) - float(kenpom_stats[away][stat]))/3
     elif stat == ADJ_D:
         away_adj_d = float(kenpom_stats[away][stat])
-        # print(kenpom_stats[away][SCHOOL_NAME] + " (AWAY) ADJ_D: " + str(away_adj_d))
         home_adj_d = float(kenpom_stats[home][stat])
-        # print(kenpom_stats[home][SCHOOL_NAME] + " (HOME) ADJ_D: " + str(home_adj_d))
         finalValue = (away_adj_d - home_adj_d)/3
     else:
+        # Case where the stat is ADJ_O or SOS
         finalValue = (float(kenpom_stats[home][stat]) - float(kenpom_stats[away][stat]))/3
     
+    # Returning our final calculation
     return float(finalValue)
 
 

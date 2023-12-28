@@ -47,7 +47,7 @@ Choose home team: Houston
 After pressing enter, your response should be:
 ```
 Purdue (HOME) vs. Houston (AWAY)
-The result is: 6.76
+The result is: +6.76
 Continue or Exit?: 
 ```
 From here, you can either exit by typing in "exit" (case doesn't matter), or continue by typing in anything else. Continue will restart the interative UI so you can query more matchups
