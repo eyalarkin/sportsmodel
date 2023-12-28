@@ -102,7 +102,7 @@ def main(argv):
             result = calculateFinal(home_sr, away_sr, home_k, away_k, 
                                     school_stats, opponent_stats, kenpom_stats)
 
-            print("The result is: " + str(result))
+            print("The result is: " + str(round(result, 2)))
             response = input("Continue or Exit?: ").lower()
             if response == 'exit':
                 break
@@ -170,8 +170,10 @@ def calculateFinal(home_sr: int, away_sr: int, home_k: int, away_k: int,
     
     total += hca
 
+    print("\n" + kenpom_stats[home_k][SCHOOL_NAME] + " (HOME) vs. " + kenpom_stats[away_k][SCHOOL_NAME] + " (AWAY)")
+
     return total
-#hi
+
 def calculateSR(home: int, away: int, stat: int, 
                 school_stats: list, opponent_stats: list) -> float:
     if stat == EFG:
@@ -203,9 +205,9 @@ def calculateKenpom(home: int, away: int, stat: int, kenpom_stats: list) -> floa
         finalValue = -(float(kenpom_stats[home][stat]) - float(kenpom_stats[away][stat]))/3
     elif stat == ADJ_D:
         away_adj_d = float(kenpom_stats[away][stat])
-        print(kenpom_stats[away][SCHOOL_NAME] + " (AWAY) ADJ_D: " + str(away_adj_d))
+        # print(kenpom_stats[away][SCHOOL_NAME] + " (AWAY) ADJ_D: " + str(away_adj_d))
         home_adj_d = float(kenpom_stats[home][stat])
-        print(kenpom_stats[home][SCHOOL_NAME] + " (HOME) ADJ_D: " + str(home_adj_d))
+        # print(kenpom_stats[home][SCHOOL_NAME] + " (HOME) ADJ_D: " + str(home_adj_d))
         finalValue = (away_adj_d - home_adj_d)/3
     else:
         finalValue = (float(kenpom_stats[home][stat]) - float(kenpom_stats[away][stat]))/3
