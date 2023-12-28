@@ -48,9 +48,7 @@ def main(argv):
 
             kenpom_stats = arr
 
-        print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
-        home = input("Choose home team: ")
-        away = input("Choose away team: ")
+        home, away = promptScript(False)
         while (home != 'exit' and away != 'exit'):
             home_k = -1
             away_k = -1
@@ -93,18 +91,12 @@ def main(argv):
 
             if home_k == -1 or away_k == -1:
                 print("Schools not found in kenpom. Please try again with correct school names. Reference the kenpom stats for what to call the school")
-                print("Restarting.\n")
-                print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
-                home = input("Choose home team: ")
-                away = input("Choose away team: ")
+                home, away = promptScript(True)
                 continue
 
             if home_sr == -1 or away_sr == -1:
                 print("Schools not found in sports-ref. Please try again with correct school names. Reference the kenpom stats for what to call the school")
-                print("Restarting.\n")
-                print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
-                home = input("Choose home team: ")
-                away = input("Choose away team: ")
+                home, away = promptScript(True)
                 continue
 
             result = calculateFinal(home_sr, away_sr, home_k, away_k, 
@@ -114,10 +106,22 @@ def main(argv):
             response = input("Continue or Exit?: ").lower()
             if response == 'exit':
                 break
-            print("Restarting.\n")
-            print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
-            home = input("Choose home team: ")
-            away = input("Choose away team: ")
+            home, away = promptScript(True)
+
+def promptScript(restarting: bool):
+    if restarting:
+        print("Restarting\n")
+    print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
+    home = input("Choose home team: ")
+    if home == "exit":
+        print("Goodbye.")
+        return 'exit', 'exit'
+    away = input("Choose away team: ")
+    if away == "exit":
+        print("Goodbye.")
+        return 'exit', 'exit'
+
+    return home, away
 
 
 def calculateFinal(home_sr: int, away_sr: int, home_k: int, away_k: int, 
