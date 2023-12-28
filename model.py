@@ -165,70 +165,116 @@ def main(argv):
             # restarting the UI with a new home and away team prompt
             home, away = promptScript(True)
 
+# PARAMS: 'restarting' - bool representing whether or not we are restarting
+# RETURNS: tuple of strings representing the home and away teams
 def promptScript(restarting: bool):
+    # if we are restarting, print a quick message letting the user know
     if restarting:
         print("Restarting\n")
+    
+    # welcome message
     print("Hello, welcome to the model. To quit, type 'exit' for one of the team names")
-    home = input("Choose home team: ")
+
+    home = input("Choose home team: ") # grabbing input for home team
+
+    # exitting if user inputs 'exit' for home
     if home == "exit":
         print("Goodbye.")
         return 'exit', 'exit'
-    away = input("Choose away team: ")
+    
+    away = input("Choose away team: ") # grabbing input for away team
+
+    # exiting if user inputs 'exit' for away
     if away == "exit":
         print("Goodbye.")
         return 'exit', 'exit'
 
-    return home, away
+    return home, away # returning a tuple with the home and away team inputted by user
 
-
+# PARAMS: 'home_sr' - int, index of home team in sports reference file
+#         'away_sr' - int, index of away team in sports reference file
+#         'home_k' - int, index of home team in kenpom file
+#         'away_k' - int, index of away team in kenpom file
+#         'school_stats' - 2D array representing sports-ref school stats
+#         'opponent_stats' - 2D array representing sports-ref opponent stats
+#         'kenpom_stats' - 2D array representing pomeroy college data
+# RETURNS: float, final line prediction of matchup
 def calculateFinal(home_sr: int, away_sr: int, home_k: int, away_k: int, 
                    school_stats: list, opponent_stats: list, kenpom_stats: list) -> float:
-    total: float = 0.0
+    
+    total: float = 0.0 # initializing our total at 0
 
+    # Here, we are going to call our sports-reference helper function to
+    # calculate and return the result of a certain statistic among the home,
+    # home opponent, away, and away opponent instances of that statistic
+
+    # calling our helper function to calculate result of EFG stat
     efg_total = calculateSR(home_sr, away_sr, EFG, school_stats, opponent_stats)
-    # print("EFG TOTAL: ", efg_total)
 
+    # calling our helper function to calculate result of TOV stat
     tov_total = calculateSR(home_sr, away_sr, TOV, school_stats, opponent_stats)
-    # print("TOV TOTAL: ", tov_total)
 
+    # calling our helper function to calculate result of ORB stat
     orb_total = calculateSR(home_sr, away_sr, ORB, school_stats, opponent_stats)
-    # print("ORB TOTAL: ", orb_total)
 
+    # calling our helper function to calculate result of FT/FGA stat
     ft_total = calculateSR(home_sr, away_sr, FT_FGA, school_stats, opponent_stats)
-    # print("FT TOTAL: ", ft_total)
 
+    # adding those calculations to our running total
     total += efg_total + tov_total + orb_total + ft_total
 
+    # Here, we have a similar function meant to calculate specific statistical
+    # results from the kenpom file, this time, using only the home and the away
+    # teams.
+
+    # calling helper function to calculate result of ADJ-O stat
     adjo_total = calculateKenpom(home_k, away_k, ADJ_O, kenpom_stats)
-    # print("ADJ_O TOTAL: ", adjo_total)
 
+    # calling helper function to calculate result of ADJ-D stat
     adjd_total = calculateKenpom(home_k, away_k, ADJ_D, kenpom_stats)
-    # print("ADJ_D TOTAL: ", adjd_total)
 
+    # calling helper function to calculate result of LUCK stat
     luck_total = calculateKenpom(home_k, away_k, LUCK, kenpom_stats)
-    # print("LUCK TOTAL: ", luck_total)
 
+    # calling helper function to calculate result of STRENGTH OF SCHEDULE stat
     sos_total = calculateKenpom(home_k, away_k, SOS, kenpom_stats)
-    # print("SOS TOTAL: ", sos_total)
 
+    # adding those calculations to our running total
     total += adjo_total + adjd_total + luck_total + sos_total
 
+    # The final calculation that must be done is adding the home-court
+    # advantage a given school has. These numbers are populated in the
+    # 'hca.json' file, which we open and read.
+
     f = open('hca.json')
-    all_hca = json.load(f)
+    all_hca = json.load(f) # load JSON data into a dict
+
+    # here we grab the name and conference of the school according to the
+    # kenpom file formatting
     home_name = kenpom_stats[home_k][SCHOOL_NAME]
     home_conf = kenpom_stats[home_k][SCHOOL_CONF]
 
+    # if the dict contains that school in the list of h.c. advantages, we grab
+    # the hca value and save it.
     if home_name in all_hca['schools'].keys():
         hca = all_hca['schools'][home_name]
+    # otherwise, we check if the dict contains the school's conference, if so
+    # we grab the general hca for that conference and save it.
     elif home_conf in all_hca['conferences'].keys():
         hca = all_hca['conferences'][home_conf]
+    # otherwise, the dict doesn't contain the specific hca for that school or
+    # conference, so we assign it the 'general' home-court advantage
     else:
         hca = all_hca['general']
     
+    # then, we add the home court advantage to the running total
     total += hca
 
+    # here, we output to the user the matchup they inputted, indicating
+    # successful calculations.
     print("\n" + kenpom_stats[home_k][SCHOOL_NAME] + " (HOME) vs. " + kenpom_stats[away_k][SCHOOL_NAME] + " (AWAY)")
 
+    # finally, we return the line prediction
     return total
 
 def calculateSR(home: int, away: int, stat: int, 
