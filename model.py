@@ -167,7 +167,7 @@ def calculateFinal(home_sr: int, away_sr: int, home_k: int, away_k: int,
     total += hca
 
     return total
-
+#hi
 def calculateSR(home: int, away: int, stat: int, 
                 school_stats: list, opponent_stats: list) -> float:
     if stat == EFG:
