@@ -125,30 +125,30 @@ def calculateFinal(home_sr: int, away_sr: int, home_k: int, away_k: int,
     total: float = 0.0
 
     efg_total = calculateSR(home_sr, away_sr, EFG, school_stats, opponent_stats)
-    print("EFG TOTAL: ", efg_total)
+    # print("EFG TOTAL: ", efg_total)
 
     tov_total = calculateSR(home_sr, away_sr, TOV, school_stats, opponent_stats)
-    print("TOV TOTAL: ", tov_total)
+    # print("TOV TOTAL: ", tov_total)
 
     orb_total = calculateSR(home_sr, away_sr, ORB, school_stats, opponent_stats)
-    print("ORB TOTAL: ", orb_total)
+    # print("ORB TOTAL: ", orb_total)
 
     ft_total = calculateSR(home_sr, away_sr, FT_FGA, school_stats, opponent_stats)
-    print("FT TOTAL: ", ft_total)
+    # print("FT TOTAL: ", ft_total)
 
     total += efg_total + tov_total + orb_total + ft_total
 
     adjo_total = calculateKenpom(home_k, away_k, ADJ_O, kenpom_stats)
-    print("ADJ_O TOTAL: ", adjo_total)
+    # print("ADJ_O TOTAL: ", adjo_total)
 
     adjd_total = calculateKenpom(home_k, away_k, ADJ_D, kenpom_stats)
-    print("ADJ_D TOTAL: ", adjd_total)
+    # print("ADJ_D TOTAL: ", adjd_total)
 
     luck_total = calculateKenpom(home_k, away_k, LUCK, kenpom_stats)
-    print("LUCK TOTAL: ", luck_total)
+    # print("LUCK TOTAL: ", luck_total)
 
     sos_total = calculateKenpom(home_k, away_k, SOS, kenpom_stats)
-    print("SOS TOTAL: ", sos_total)
+    # print("SOS TOTAL: ", sos_total)
 
     total += adjo_total + adjd_total + luck_total + sos_total
 
