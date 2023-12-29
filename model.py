@@ -349,7 +349,7 @@ def calculateKenpom(home: int, away: int, stat: int, kenpom_stats: list) -> floa
         # Case where the stat is ADJ_O or SOS
         finalValue = (float(kenpom_stats[home][stat]) - float(kenpom_stats[away][stat]))/3
     
-    # Returning our final calculation
+    # Returning our final calculation, as a float
     return float(finalValue)
 
 
