@@ -8,7 +8,7 @@ SCHOOL_NAME = 1 # col 2 on kenpom
 SCHOOL_CONF = 2 # col 3 on kenpom
 
 ADJ_O = 5 # col 6 on kenpom
-ADJ_D = 7 # col 7 on kenpom
+ADJ_D = 7 # col 8 on kenpom
 LUCK = 11 # col 12 on kenpom
 SOS = 13 # col 14 on kenpom
 
