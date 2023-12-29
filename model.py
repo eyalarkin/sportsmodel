@@ -83,15 +83,7 @@ def main(argv):
                     # 'St.' in kenpom is represented as 'State' in sports-reference.
                     # we check if the name ends with 'St.', and if it does, we replace it
                     # with 'State', so we can find it in the sports-reference file.
-                    if home[len(home)-3:len(home)] == 'St.':
-                        home = home[0:len(home)-3]
-                        home += "State"
-                    
-                    # so far, LSU is the only outlier that we've found to this
-                    # in kenpom, it is represented as 'LSU', in sports-reference,
-                    # it is represented as 'Lousiana State'
-                    elif home == 'LSU':
-                        home = "Louisiana State"
+                    home = adjustName(home)
 
                 i += 1 # incrementing i for next iteration
 
@@ -104,11 +96,7 @@ def main(argv):
                     away_k = i
 
                     # making the same naming adjustments
-                    if away[len(away)-3:len(away)] == 'St.':
-                        away = away[0:len(away)-3]
-                        away += "State"
-                    elif away == 'LSU':
-                        away = "Louisiana State"
+                    away = adjustName(away)
                 i += 1 # incrementing i
 
 
@@ -167,6 +155,37 @@ def main(argv):
 
             # restarting the UI with a new home and away team prompt
             home, away = promptScript(True)
+
+def adjustName(name: str) -> str:
+    if name[len(name)-3:len(name)] == 'St.':
+        name = name[0:len(name)-3]
+        name += "State"
+        return name
+    
+    # so far, these are the only outlier that we've found to this
+    # in kenpom, it is represented as 'LSU', in sports-reference,
+    # it is represented as 'Lousiana State'
+    elif name == 'LSU':
+        return "Louisiana State"
+    
+    # making the same adjustments for Miami Ohio & Florida
+    elif name == 'Miami FL':
+        return 'Miami (FL)'
+    
+    elif name == 'Miami OH':
+        return 'Miami (OH)'
+    
+    elif name == 'Bethune Cookman':
+        return 'Bethune-Cookman'
+
+    elif name == 'UCF':
+        return 'Central Florida'
+    elif name == 'Loyola MD':
+        return 'Loyola (MD)'
+    elif name == 'Loyola Chicago':
+        return 'Loyola (IL)'
+    else:
+        return name
 
 # PARAMS: 'restarting' - bool representing whether or not we are restarting
 # RETURNS: tuple of strings representing the home and away teams
